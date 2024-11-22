@@ -14,39 +14,32 @@
 <body style="margin: 0px; overflow: hidden;">
     <a-scene vr-mode-ui="enabled: false" arjs="debugUIEnabled:false">
         <a-assets>
-            <audio id="audio" preload="auto" src="dry-fart.mp3"></audio>
+            <audio id="audio" preload="auto" src="./dry-fart.mp3"></audio>
             <img id="1" src="./canvaai.webp"/>
         </a-assets>
         <a-marker present="hiro" controlador>
-            <a-video width="1" height="1" rotation="-90 0 0" position="0 0 0" src="#video"></a-video>
-            <a-image width="1" height="1" rotation="-90 0 0" position="0 0 0" src="#1"> </a-image>
-            <a-entity sound="src: #audio; autoplay:true loop: true"> </a-entity>
+            <a-image width="1" height="1" rotation="-90 0 0" position="0 0 0" src="#1"></a-image>
+            <a-entity sound="src: #audio; autoplay: false; loop: true"></a-entity>
         </a-marker>
-        <a-entity camera="">
-        </a-entity>
+        <a-entity camera></a-entity>
     </a-scene>
     <script>
-        // Aguardando a interação do usuário
-        AFRAME.registerComponent(
-            'controlador', {
-                init: function(){
+        // Custom component to handle marker detection
+        AFRAME.registerComponent('controlador', {
+            init: function () {
+                this.sound = document.querySelector('[sound]');
+                this.toggle = false;
+            },
+            tick: function () {
+                if (this.el.object3D.visible === true && !this.toggle) {
+                    this.toggle = true;
+                    this.sound.components.sound.playSound();
+                } else if (this.el.object3D.visible === false && this.toggle) {
                     this.toggle = false;
-                    this.vid=document.querySelector("#video");
-                    this.vid.pause();
-                },
-                tick: function(){
-                    if (this.el.object3D.visible == true){
-                        if(!this.toggle){
-                            this.toggle = true;
-                            this.vid.play();
-                        }else{
-                            this.toggle = false;
-                            this.vid.pause();
-                        }
-                    }
+                    this.sound.components.sound.stopSound();
                 }
             }
-        );
-      </script>
+        });
+    </script>
 </body>
 </html>
